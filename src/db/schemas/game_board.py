@@ -1,5 +1,6 @@
+from datetime import datetime
 from pydantic import BaseModel
-from typing import List, Literal
+from typing import List, Literal, Optional
 
 
 """
@@ -21,7 +22,22 @@ TGameBoardState = List[List[TGameStateValue]]
 TShotsRecord = List[List[bool]]
 
 
-class GameBoard(BaseModel):
+class GameBoardSchema(BaseModel):
+    """ Схема модели игровой доски """
+
+    id:           str
+    game_id:      str
+    player_id:    str
+    board_state:  TGameBoardState
+    shots_record: TShotsRecord
+    created_at:   datetime
+    updated_at:   Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
+class GameBoardViewSchema(BaseModel):
     """ Модель для представления игровой доски """
 
     board:           TGameBoardState
@@ -29,17 +45,18 @@ class GameBoard(BaseModel):
     ships_remaining: int
 
 
-class PlayerBoard(BaseModel):
+class PlayerBoardSchema(BaseModel):
     """ Модель для представления игровой доски игрока в ответе игры """
 
     player_id: str
-    board:     GameBoard
+    board:     GameBoardViewSchema
 
 
 __all__ = [
     'TGameBoardState',
     'TGameStateValue',
     'TShotsRecord',
-    'GameBoard',
-    'PlayerBoard'
+    'GameBoardViewSchema',
+    'PlayerBoardSchema',
+    'GameBoardSchema'
 ]

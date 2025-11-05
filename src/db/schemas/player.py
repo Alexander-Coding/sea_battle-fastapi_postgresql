@@ -6,21 +6,33 @@ from typing import List, Optional, Literal
 TGameResult = Literal["win", "loss"]
 
 
-class PlayerCreate(BaseModel):
+class PlayerSchema(BaseModel):
+    """ Схема модели игрока """
+
+    id:         str
+    username:   str
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
+class PlayerCreateSchema(BaseModel):
     """ Модель для создания игрока """
 
     username: str = Field(..., min_length=3, max_length=50)
     password: str = Field(..., min_length=6)
 
 
-class PlayerLogin(BaseModel):
+class PlayerLoginSchema(BaseModel):
     """ Модель для входа игрока """
 
     username: str
     password: str
 
 
-class PlayerResponse(BaseModel):
+class PlayerResponseSchema(BaseModel):
     """ Модель ответа с информацией об игроке """
 
     id:         str
@@ -31,7 +43,7 @@ class PlayerResponse(BaseModel):
         from_attributes = True
 
 
-class GameResult(BaseModel):
+class GameResultSchema(BaseModel):
     """ Модель для представления результата игры """
 
     game_id:           str
@@ -41,20 +53,21 @@ class GameResult(BaseModel):
     finished_at:       Optional[datetime]
 
 
-class PlayerStats(BaseModel):
+class PlayerStatsSchema(BaseModel):
     """ Модель для представления статистики игрока """
 
-    player:      PlayerResponse
+    player:      PlayerResponseSchema
     total_games: int
     wins:        int
     losses:      int
-    games:       List[GameResult]
+    games:       List[GameResultSchema]
 
 
 __all__ = [
-    'PlayerCreate',
-    'PlayerLogin',
-    'PlayerResponse',
-    'GameResult',
-    'PlayerStats'
+    'PlayerCreateSchema',
+    'PlayerLoginSchema',
+    'PlayerResponseSchema',
+    'GameResultSchema',
+    'PlayerStatsSchema',
+    'PlayerSchema'
 ]
