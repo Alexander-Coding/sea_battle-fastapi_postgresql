@@ -1,7 +1,9 @@
 from pydantic_settings import BaseSettings
 
+from src.utils import SingletonMeta
 
-class Config(BaseSettings):
+
+class Config(BaseSettings, metaclass=SingletonMeta):
     # Database
     DB_USER: str
     DB_PASS: str
