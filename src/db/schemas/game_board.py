@@ -25,13 +25,14 @@ TShotsRecord = List[List[bool]]
 class GameBoardSchema(BaseModel):
     """ Схема модели игровой доски """
 
-    id:           str
-    game_id:      str
-    player_id:    str
-    board_state:  TGameBoardState
-    shots_record: TShotsRecord
-    created_at:   datetime
-    updated_at:   Optional[datetime]
+    id:              str
+    game_id:         str
+    player_id:       str
+    board_state:     TGameBoardState
+    shots_record:    TShotsRecord
+    created_at:      datetime
+    updated_at:      Optional[datetime]
+    ships_remaining: int
 
     class Config:
         from_attributes = True

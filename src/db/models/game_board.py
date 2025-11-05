@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from uuid import UUID as UUIDType
-from sqlalchemy import ForeignKey, Index
+from sqlalchemy import ForeignKey, Index, Integer
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
@@ -21,6 +21,7 @@ class GameBoard(UUIDBase):
             - player_id:       идентификатор игрока (UUID)
             - board_state:     состояние игровой доски (JSONB)
             - shots_record:    запись выстрелов (JSONB)
+            - ships_remaining: количество оставшихся кораблей у игрока (Integer)
             - created_at:      дата и время создания записи (из UUIDBase)
             - updated_at:      дата и время последнего обновления записи (из UUIDBase)
 
@@ -41,14 +42,15 @@ class GameBoard(UUIDBase):
 
     __tablename__ = "game_boards"
 
-    game_id:      Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("games.id"), nullable=False)
-    player_id:    Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("players.id"), nullable=False)
+    game_id:         Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("games.id"), nullable=False)
+    player_id:       Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("players.id"), nullable=False)
 
-    board_state:  Mapped[TGameBoardState] = mapped_column(JSONB, nullable=False)
-    shots_record: Mapped[TShotsRecord] = mapped_column(JSONB, nullable=False)
+    board_state:     Mapped[TGameBoardState] = mapped_column(JSONB, nullable=False)
+    shots_record:    Mapped[TShotsRecord] = mapped_column(JSONB, nullable=False)
+    ships_remaining: Mapped[int] = mapped_column(Integer, default=10, nullable=False)
 
-    game:         Mapped["Game"] = relationship("Game", back_populates="game_boards")
-    player:       Mapped["Game"] = relationship("Player", back_populates="game_boards")
+    game:   Mapped["Game"] = relationship("Game", back_populates="game_boards")
+    player: Mapped["Game"] = relationship("Player", back_populates="game_boards")
 
     __table_args__ = (
         Index('ix_game_boards_game_id_player_id', 'game_id', 'player_id', unique=True),
