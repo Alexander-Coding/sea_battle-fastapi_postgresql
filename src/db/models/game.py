@@ -39,13 +39,13 @@ class Game(UUIDBase):
     player1_id:     Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("players.id"), nullable=False)
     player2_id:     Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("players.id"), nullable=False)
 
-    turn_player_id: Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("players.id"))
-    winner_id:      Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("players.id"))
+    turn_player_id: Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("players.id"), nullable=True)
+    winner_id:      Mapped[UUIDType] = mapped_column(UUID(as_uuid=True), ForeignKey("players.id"), nullable=True)
 
     status:         Mapped[GameStatus] = mapped_column(Enum(GameStatus), default=GameStatus.WAITING, nullable=False, index=True)
 
-    started_at:     Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
-    finished_at:    Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    started_at:     Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True, nullable=True)
+    finished_at:    Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True, nullable=True)
 
     player1:        Mapped["Player"] = relationship("Player", foreign_keys=[player1_id], back_populates="games_as_player1")
     player2:        Mapped["Player"] = relationship("Player", foreign_keys=[player2_id], back_populates="games_as_player2")

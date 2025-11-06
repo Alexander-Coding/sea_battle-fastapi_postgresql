@@ -18,12 +18,12 @@ console_handler.setFormatter(formatter)
 console_handler.setLevel(logging.INFO)
 
 # File handler
-file_handler = logging.FileHandler(log_dir / "battleship.log")
+file_handler = logging.FileHandler(log_dir / "battleship.log", encoding="utf-8")
 file_handler.setFormatter(formatter)
 file_handler.setLevel(logging.DEBUG)
 
 # Error file handler
-error_handler = logging.FileHandler(log_dir / "error.log")
+error_handler = logging.FileHandler(log_dir / "error.log", encoding="utf-8")
 error_handler.setFormatter(formatter)
 error_handler.setLevel(logging.ERROR)
 

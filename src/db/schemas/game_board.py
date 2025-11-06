@@ -1,5 +1,6 @@
+from uuid import UUID
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from typing import List, Literal, Optional
 
 
@@ -10,7 +11,7 @@ from typing import List, Literal, Optional
     -1    - промах
     -2    - попадание
 """
-TGameStateValue = Literal[0, 1, 2, 3, 4, -1, -2]
+TGameStateValue = int
 TGameBoardState = List[List[TGameStateValue]]
 
 
@@ -25,9 +26,9 @@ TShotsRecord = List[List[bool]]
 class GameBoardSchema(BaseModel):
     """ Схема модели игровой доски """
 
-    id:              str
-    game_id:         str
-    player_id:       str
+    id:              UUID
+    game_id:         UUID
+    player_id:       UUID
     board_state:     TGameBoardState
     shots_record:    TShotsRecord
     created_at:      datetime
@@ -36,6 +37,13 @@ class GameBoardSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+    @field_serializer('id', 'game_id', 'player_id')
+    def _serialize_uuid(self, value: UUID | None) -> UUID | None:
+        if value is None:
+            return None
+
+        return str(value)
 
 
 class GameBoardViewSchema(BaseModel):
@@ -49,8 +57,15 @@ class GameBoardViewSchema(BaseModel):
 class PlayerBoardSchema(BaseModel):
     """ Модель для представления игровой доски игрока в ответе игры """
 
-    player_id: str
+    player_id: UUID
     board:     GameBoardViewSchema
+
+    @field_serializer('player_id')
+    def _serialize_uuid(self, value: UUID | None) -> UUID | None:
+        if value is None:
+            return None
+
+        return str(value)
 
 
 __all__ = [

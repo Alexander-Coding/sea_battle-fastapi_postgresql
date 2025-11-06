@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+from uuid import UUID
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 from typing import List, Optional, Literal
 
 
@@ -9,13 +12,20 @@ TGameResult = Literal["win", "loss"]
 class PlayerSchema(BaseModel):
     """ Схема модели игрока """
 
-    id:         str
+    id:         UUID
     username:   str
     created_at: datetime
     updated_at: Optional[datetime]
 
     class Config:
         from_attributes = True
+
+    @field_serializer('id')
+    def _serialize_uuid(self, value: UUID | None) -> UUID | None:
+        if value is None:
+            return None
+
+        return str(value)
 
 
 class PlayerCreateSchema(BaseModel):
@@ -35,22 +45,36 @@ class PlayerLoginSchema(BaseModel):
 class PlayerResponseSchema(BaseModel):
     """ Модель ответа с информацией об игроке """
 
-    id:         str
+    id:         UUID
     username:   str
     created_at: datetime
 
     class Config:
         from_attributes = True
 
+    @field_serializer('id')
+    def _serialize_uuid(self, value: UUID | None) -> UUID | None:
+        if value is None:
+            return None
+
+        return str(value)
+
 
 class GameResultSchema(BaseModel):
     """ Модель для представления результата игры """
 
-    game_id:           str
+    game_id:           UUID
     opponent_username: str
     result:            TGameResult
     created_at:        datetime
     finished_at:       Optional[datetime]
+
+    @field_serializer('game_id')
+    def _serialize_uuid(self, value: UUID | None) -> UUID | None:
+        if value is None:
+            return None
+
+        return str(value)
 
 
 class PlayerStatsSchema(BaseModel):

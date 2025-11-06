@@ -4,9 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from src import logger
-from src.core import database_client
 from src.db.models import Player
 from src.services.auth import decode_access_token
+
+from .db import get_db
 
 
 security = HTTPBearer()
@@ -14,7 +15,7 @@ security = HTTPBearer()
 
 async def get_current_player(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    db:          AsyncSession = Depends(database_client.get_session)
+    db:          AsyncSession = Depends(get_db)
 ) -> Player:
     """Получение текущего аутентифицированного игрока"""
     try:

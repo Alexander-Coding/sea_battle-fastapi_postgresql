@@ -1,4 +1,6 @@
 import jwt
+import hashlib
+import secrets
 
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
@@ -11,12 +13,16 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Проверка пароля"""
-    return pwd_context.verify(plain_password, hashed_password)
+    salt, hashed = hashed_password.split(":")
 
+    return hashed == hashlib.sha256((plain_password + salt).encode()).hexdigest()
 
 def get_password_hash(password: str) -> str:
     """Хеширование пароля"""
-    return pwd_context.hash(password)
+    salt = secrets.token_hex(16)
+    hashed_password = hashlib.sha256((password + salt).encode()).hexdigest()
+
+    return f'{salt}:{hashed_password}'
 
 
 def create_access_token(data: dict) -> str:
@@ -25,13 +31,15 @@ def create_access_token(data: dict) -> str:
     expire = datetime.now() + timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
 
+    to_encode['sub'] = str(to_encode['sub'])
+
     encoded_jwt = jwt.encode(
         to_encode,
         config.SECRET_KEY,
         algorithm=config.ALGORITHM
     )
 
-    logger.info(f"Access token created for: {data.get('sub')}")
+    logger.info(f"Токен доступа создан для: {data.get('sub')}")
 
     return encoded_jwt
 
@@ -46,7 +54,7 @@ def decode_access_token(token: str) -> dict:
         )
         return payload
     except Exception as e:
-        logger.error(f"JWT decode error: {e}")
+        logger.error(f"Ошибка чтения JWT токена: {e}")
         raise
 
 

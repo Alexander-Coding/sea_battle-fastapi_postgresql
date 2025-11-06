@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from contextlib import asynccontextmanager
-from typing import Optional, AsyncGenerator
+from typing import Optional, AsyncGenerator, Any
 from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine, async_sessionmaker
 from advanced_alchemy.config import AsyncSessionConfig, SQLAlchemyAsyncConfig
@@ -43,8 +45,8 @@ class DatabaseClient(metaclass=SingletonMeta):
         """
 
         self._engine = create_async_engine(
-            config.database_url_asyncpg,
-            echo=config.DB_ECHO,
+            config.database_url,
+            echo=False,
             poolclass=NullPool,
             pool_pre_ping=True
         )
@@ -62,7 +64,7 @@ class DatabaseClient(metaclass=SingletonMeta):
         )
 
         self._sqlalchemy_config = SQLAlchemyAsyncConfig(
-            connection_string=config.database_url_asyncpg,
+            connection_string=config.database_url,
             session_config=session_config
         )
 
@@ -76,6 +78,16 @@ class DatabaseClient(metaclass=SingletonMeta):
             yield session
 
             await session.commit()
+
+    async def get_db(self) -> AsyncGenerator[AsyncSession | Any, Any]:
+        if not self._engine:
+            await self.initialize()
+
+        async with self.async_session_factory() as db:
+            yield db
+
+            await db.commit()
+            await db.close()
 
     async def create_tables(self):
         """

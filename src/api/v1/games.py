@@ -45,7 +45,7 @@ async def create_game(
         :returns:              Созданная игра
     """
 
-    logger.info(f"Создание игры между {game_data.player1_sid} и {game_data.player2_sid}")
+    logger.info(f"Создание игры между {game_data.player1_id} и {game_data.player2_id}")
 
     # Проверка существования игроков
     players_repo = PlayerRepository(session=db)
@@ -62,8 +62,8 @@ async def create_game(
             detail="Один или оба игрока не найдены"
         )
 
-    player1 = next(p for p in players if p.sid == game_data.player1_sid)
-    player2 = next(p for p in players if p.sid == game_data.player2_sid)
+    player1 = next(p for p in players if p.id == game_data.player1_id)
+    player2 = next(p for p in players if p.id == game_data.player2_id)
 
     # Проверка активных игр
     games_repo = GameRepository(session=db)
@@ -111,7 +111,6 @@ async def create_game(
         shots_record=[[False] * 10 for _ in range(10)],
         ships_remaining=10
     )
-
 
     game_boards_repo = GameBoardRepository(session=db)
 
